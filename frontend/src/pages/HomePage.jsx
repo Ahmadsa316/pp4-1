@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 
 function HomePage() {
   const [jobs, setJobs] = useState([]);
@@ -20,19 +21,17 @@ function HomePage() {
     fetchJobs();
   }, []);
 
-  if (loading) {
-    return <p>Loading jobs...</p>;
-  }
+  if (loading) return <p>Loading jobs...</p>;
 
-  if (jobs.length === 0) {
-    return <p>No jobs found</p>;
-  }
+  if (jobs.length === 0) return <p>No jobs found</p>;
 
   return (
     <div>
       {jobs.map((job) => (
-        <div key={job.id}>
-          <h2>{job.title}</h2>
+        <div key={job.id} style={{ marginBottom: "20px" }}>
+          <h2>
+            <Link to={`/jobs/${job.id}`}>{job.title}</Link>
+          </h2>
           <p>Type: {job.type}</p>
           <p>Description: {job.description}</p>
           <p>Company: {job.company.name}</p>
