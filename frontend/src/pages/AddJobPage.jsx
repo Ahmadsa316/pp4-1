@@ -1,92 +1,75 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-const AddJobPage = () => {
+function AddJobPage() {
   const [title, setTitle] = useState("");
-  const [type, setType] = useState("Full-Time");
-  const [location, setLocation] = useState("");
+  const [type, setType] = useState("");
   const [description, setDescription] = useState("");
-  const [salary, setSalary] = useState(4500);
   const [companyName, setCompanyName] = useState("");
   const [contactEmail, setContactEmail] = useState("");
   const [contactPhone, setContactPhone] = useState("");
+  const [location, setLocation] = useState("");
+  const [salary, setSalary] = useState(0);
 
   const navigate = useNavigate();
 
-  const submitForm = (e) => {
+  const submitForm = async (e) => {
     e.preventDefault();
-    console.log("AddJobPage");
+
+    const newJob = {
+      title,
+      type,
+      description,
+      company: {
+        name: companyName,
+        contactEmail,
+        contactPhone,
+      },
+      location,
+      salary: Number(salary),
+    };
+
+    try {
+      const res = await fetch("/api/jobs", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(newJob),
+      });
+
+      if (res.ok) {
+        console.log("Job created!");
+        navigate("/");
+      } else {
+        console.log("Error creating job");
+      }
+    } catch (error) {
+      console.error("Error:", error);
+    }
   };
 
   return (
-    <div className="create">
-      <h2>Add a New Job</h2>
-      <form onSubmit={submitForm}>
-        <label htmlFor="title">Job title:</label>
-        <input
-          id="title"
-          type="text"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-        />
-        <label htmlFor="type">Job type:</label>
-        <select
-          id="type"
-          value={type}
-          onChange={(e) => setType(e.target.value)}
-        >
-          <option value="" disabled>
-            Select job type
-          </option>
-          <option value="Full-Time">Full-Time</option>
-          <option value="Part-Time">Part-Time</option>
-          <option value="Internship">Internship</option>
-        </select>
-        <label htmlFor="description">Job Description:</label>
-        <textarea
-          id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
-        ></textarea>
-        <label htmlFor="companyName">Company Name:</label>
-        <input
-          id="companyName"
-          type="text"
-          value={companyName}
-          onChange={(e) => setCompanyName(e.target.value)}
-        />
-        <label htmlFor="contactEmail">Contact Email:</label>
-        <input
-          id="contactEmail"
-          type="email"
-          value={contactEmail}
-          onChange={(e) => setContactEmail(e.target.value)}
-        />
-        <label htmlFor="contactPhone">Contact Phone:</label>
-        <input
-          id="contactPhone"
-          type="tel"
-          value={contactPhone}
-          onChange={(e) => setContactPhone(e.target.value)}
-        />
-        <label htmlFor="location">Location:</label>
-        <input
-          id="location"
-          type="text"
-          value={location}
-          onChange={(e) => setLocation(e.target.value)}
-        />
-        <label htmlFor="salary">Salary:</label>
-        <input
-          id="salary"
-          type="text"
-          value={salary}
-          onChange={(e) => setSalary(e.target.value)}
-        />
-        <button type="submit">Add Job</button>
-      </form>
-    </div>
+    <form onSubmit={submitForm} style={{ display: "flex", flexDirection: "column", gap: "10px", width: "300px", margin: "20px auto" }}>
+      <h2>Add Job</h2>
+      
+      <input type="text" placeholder="Job Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+
+      <input type="text" placeholder="Job Type" value={type} onChange={(e) => setType(e.target.value)} required />
+
+      <textarea placeholder="Job Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+
+      <input type="text" placeholder="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+
+      <input type="email" placeholder="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required />
+
+      <input type="text" placeholder="Contact Phone" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required />
+
+      <input type="text" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} required />
+
+      <input type="number" placeholder="Salary" value={salary} onChange={(e) => setSalary(e.target.value)} required />
+
+      <button type="submit" style={{ padding: "10px", backgroundColor: "black", color: "white", borderRadius: "5px" }}>Submit</button>
+    </form>
   );
-};
+}
 
 export default AddJobPage;
