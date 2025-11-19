@@ -41,6 +41,7 @@ function JobPage() {
 
   return (
     <div>
+      
       <h1>{job.title}</h1>
       <p><strong>Type:</strong> {job.type}</p>
       <p><strong>Description:</strong> {job.description}</p>
