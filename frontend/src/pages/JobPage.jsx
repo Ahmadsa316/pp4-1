@@ -52,6 +52,9 @@ function JobPage() {
       <p><strong>Salary:</strong> {job.salary}</p>
 
       <br />
+      <Link to={`/edit-job/${id}`}>
+        <button>Edit Job</button>
+      </Link>
 
       <button
         onClick={handleDelete}

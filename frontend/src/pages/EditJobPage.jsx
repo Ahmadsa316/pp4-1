@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 
-const EditJobPage = () => {
+function EditJobPage() {
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -22,6 +22,7 @@ const EditJobPage = () => {
         const res = await fetch(`/api/jobs/${id}`);
         if (!res.ok) throw new Error("Failed to fetch job");
         const data = await res.json();
+
         setTitle(data.title || "");
         setType(data.type || "");
         setDescription(data.description || "");
@@ -31,16 +32,17 @@ const EditJobPage = () => {
         setLocation(data.location || "");
         setSalary(data.salary || "");
       } catch (err) {
-        console.error(err);
-        setError("Unable to load job details.");
+        console.error("Error fetching job:", err);
+        setError("Failed to load job details.");
       } finally {
         setLoading(false);
       }
     };
+
     fetchJob();
   }, [id]);
 
-  const submitForm = async (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     const updatedJob = {
@@ -59,73 +61,53 @@ const EditJobPage = () => {
     try {
       const res = await fetch(`/api/jobs/${id}`, {
         method: "PUT",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(updatedJob),
       });
 
-      if (!res.ok) throw new Error("Failed to update job");
+      if (!res.ok) throw new Error("Update failed");
 
-      // Navigate to the job details page after successful update
       navigate(`/jobs/${id}`);
     } catch (err) {
-      console.error(err);
-      setError("Update failed. Please try again.");
+      console.error("Error updating job:", err);
+      setError("Failed to update job.");
     }
   };
 
-  const cancelEdit = () => {
-    // Simply navigate back to the job details page
-    navigate(`/jobs/${id}`);
-  };
+  const cancelEdit = () => navigate(`/jobs/${id}`);
 
-  if (loading) return <p>Loading job details...</p>;
+  if (loading) return <p>Loading...</p>;
   if (error) return <p className="error">{error}</p>;
 
   return (
-    <div className="edit-job">
-      <h2>Edit Job</h2>
-      <form onSubmit={submitForm}>
-        <label>Job title:</label>
-        <input value={title} onChange={(e) => setTitle(e.target.value)} />
+    <div>
+      <h1>Edit Job</h1>
+      <form onSubmit={handleSubmit}>
+        <input value={title} placeholder="Title" onChange={(e) => setTitle(e.target.value)} required />
 
-        <label>Job type:</label>
-        <select value={type} onChange={(e) => setType(e.target.value)}>
-          <option value="" disabled>
-            Select job type
-          </option>
+        <select value={type} onChange={(e) => setType(e.target.value)} required>
+          <option value="">Select Job Type</option>
           <option value="Full-Time">Full-Time</option>
           <option value="Part-Time">Part-Time</option>
           <option value="Remote">Remote</option>
           <option value="Internship">Internship</option>
         </select>
 
-        <label>Job Description:</label>
-        <textarea value={description} onChange={(e) => setDescription(e.target.value)} />
+        <textarea value={description} placeholder="Description" onChange={(e) => setDescription(e.target.value)} required />
 
-        <label>Company Name:</label>
-        <input value={companyName} onChange={(e) => setCompanyName(e.target.value)} />
+        <input value={companyName} placeholder="Company Name" onChange={(e) => setCompanyName(e.target.value)} required />
+        <input value={contactEmail} placeholder="Email" onChange={(e) => setContactEmail(e.target.value)} required />
+        <input value={contactPhone} placeholder="Phone" onChange={(e) => setContactPhone(e.target.value)} required />
 
-        <label>Contact Email:</label>
-        <input value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} />
+        <input value={location} placeholder="Location" onChange={(e) => setLocation(e.target.value)} required />
+        <input type="number" value={salary} placeholder="Salary" onChange={(e) => setSalary(e.target.value)} required />
 
-        <label>Contact Phone:</label>
-        <input value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} />
-
-        <label>Location:</label>
-        <input value={location} onChange={(e) => setLocation(e.target.value)} />
-
-        <label>Salary:</label>
-        <input value={salary} onChange={(e) => setSalary(e.target.value)} />
-
-        <button type="submit">Update Job</button>
-        <button type="button" onClick={cancelEdit}>
-          Cancel
-        </button>
+        <br /><br />
+        <button type="submit">Save Changes</button>
+        <button type="button" onClick={cancelEdit} style={{ marginLeft: "10px" }}>Cancel</button>
       </form>
     </div>
   );
-};
+}
 
 export default EditJobPage;
