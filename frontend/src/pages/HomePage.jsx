@@ -21,20 +21,22 @@ function HomePage() {
     fetchJobs();
   }, []);
 
-  if (loading) return <p>Loading jobs...</p>;
-
+  if (loading) return <p>Loading...</p>;
   if (jobs.length === 0) return <p>No jobs found</p>;
 
   return (
     <div>
+      <h1>Job Listings</h1>
+
+      <Link to="/add-job">
+        <button>Add Job</button>
+      </Link>
+
       {jobs.map((job) => (
-        <div key={job.id} style={{ marginBottom: "20px" }}>
-          <h2>
-            <Link to={`/jobs/${job.id}`}>{job.title}</Link>
-          </h2>
+        <div key={job._id}>
+          <Link to={`/job/${job._id}`}><h2>{job.title}</h2></Link>
           <p>Type: {job.type}</p>
-          <p>Description: {job.description}</p>
-          <p>Company: {job.company.name}</p>
+          <p>{job.company?.name}</p>
         </div>
       ))}
     </div>

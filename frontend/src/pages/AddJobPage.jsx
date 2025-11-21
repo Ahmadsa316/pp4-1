@@ -2,73 +2,80 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 function AddJobPage() {
-  const [title, setTitle] = useState("");
-  const [type, setType] = useState("");
-  const [description, setDescription] = useState("");
-  const [companyName, setCompanyName] = useState("");
-  const [contactEmail, setContactEmail] = useState("");
-  const [contactPhone, setContactPhone] = useState("");
-  const [location, setLocation] = useState("");
-  const [salary, setSalary] = useState(0);
-
   const navigate = useNavigate();
 
-  const submitForm = async (e) => {
+  const [formData, setFormData] = useState({
+    title: "",
+    type: "",
+    description: "",
+    location: "",
+    salary: "",
+    companyName: "",
+    contactEmail: "",
+    contactPhone: "",
+  });
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const newJob = {
-      title,
-      type,
-      description,
+    const jobData = {
+      title: formData.title,
+      type: formData.type,
+      description: formData.description,
+      location: formData.location,
+      salary: Number(formData.salary),
       company: {
-        name: companyName,
-        contactEmail,
-        contactPhone,
+        name: formData.companyName,
+        contactEmail: formData.contactEmail,
+        contactPhone: formData.contactPhone,
       },
-      location,
-      salary: Number(salary),
     };
 
     try {
       const res = await fetch("/api/jobs", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(newJob),
+        body: JSON.stringify(jobData),
       });
 
-      if (res.ok) {
-        console.log("Job created!");
-        navigate("/");
-      } else {
-        console.log("Error creating job");
-      }
-    } catch (error) {
-      console.error("Error:", error);
+      if (!res.ok) throw new Error("Failed to add job");
+
+      navigate("/"); // redirect to homepage
+    } catch (err) {
+      console.error("Error:", err);
+      alert("Failed to add job.");
     }
   };
 
   return (
-    <form onSubmit={submitForm} style={{ display: "flex", flexDirection: "column", gap: "10px", width: "300px", margin: "20px auto" }}>
-      <h2>Add Job</h2>
-      
-      <input type="text" placeholder="Job Title" value={title} onChange={(e) => setTitle(e.target.value)} required />
+    <div>
+      <h1>Add New Job</h1>
 
-      <input type="text" placeholder="Job Type" value={type} onChange={(e) => setType(e.target.value)} required />
+      <form onSubmit={handleSubmit}>
+        <input name="title" placeholder="Job Title" onChange={handleChange} required />
+        <input name="type" placeholder="Job Type" onChange={handleChange} required />
+        <textarea name="description" placeholder="Description" onChange={handleChange} required />
 
-      <textarea placeholder="Job Description" value={description} onChange={(e) => setDescription(e.target.value)} required />
+        <input name="location" placeholder="Location" onChange={handleChange} required />
+        <input name="salary" placeholder="Salary" type="number" onChange={handleChange} required />
 
-      <input type="text" placeholder="Company Name" value={companyName} onChange={(e) => setCompanyName(e.target.value)} required />
+        <input name="companyName" placeholder="Company Name" onChange={handleChange} required />
+        <input name="contactEmail" placeholder="Contact Email" onChange={handleChange} required />
+        <input name="contactPhone" placeholder="Contact Phone" onChange={handleChange} required />
 
-      <input type="email" placeholder="Contact Email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} required />
+        <button type="submit">Add Job</button>
+      </form>
 
-      <input type="text" placeholder="Contact Phone" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} required />
-
-      <input type="text" placeholder="Location" value={location} onChange={(e) => setLocation(e.target.value)} required />
-
-      <input type="number" placeholder="Salary" value={salary} onChange={(e) => setSalary(e.target.value)} required />
-
-      <button type="submit" style={{ padding: "10px", backgroundColor: "black", color: "white", borderRadius: "5px" }}>Submit</button>
-    </form>
+      <br />
+      <button onClick={() => navigate("/")}>⬅ Back</button>
+    </div>
   );
 }
 
